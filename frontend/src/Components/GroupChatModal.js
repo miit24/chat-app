@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Store } from '../Store'
 import {
     Modal,
@@ -18,7 +18,12 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 import UserListItem from './UserListItem'
 import UserBadge from './UserBadge'
-import { getError } from '../util';
+import { getError } from '../util'
+import io from 'socket.io-client'
+
+
+const ENDPOINT = "http://localhost:5001"
+let socket
 
 function GroupChatModal({ children }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -30,10 +35,12 @@ function GroupChatModal({ children }) {
     const { state, selectedChat, setSelectedChat, chats, setChats } = useContext(Store)
     const { userInfo } = state
 
+    useEffect(() => {
+        socket = io(ENDPOINT)
+    }, [])
+
     const handleSearch = async (query) => {
         setSearch(query)
-        // console.log(query) eg:ii
-        // console.log(search) this would be only i
         if (!query) {
             return
         }
@@ -61,29 +68,29 @@ function GroupChatModal({ children }) {
 
     const deleteHandle = (user) => {
         setSelectedUsers(
-            selectedUsers.filter(u=>u._id!==user._id)
+            selectedUsers.filter(u => u._id !== user._id)
         )
     }
 
     const handleSubmit = async () => {
-        if(!groupChatName || !selectedUsers)
-        {
+        if (!groupChatName || !selectedUsers) {
             toast.error("Fill up the fields")
             return
         }
 
         try {
             const config = {
-                headers : {
+                headers: {
                     authorization: `Bearer ${userInfo.token}`
                 }
             }
 
-            const {data} = await axios.post(`/api/chats/group`,{
-                name:groupChatName,
-                users:JSON.stringify(selectedUsers.map(u=>u._id))
-            },config)
-            setChats([data,...chats])
+            const { data } = await axios.post(`/api/chats/group`, {
+                name: groupChatName,
+                users: JSON.stringify(selectedUsers.map(u => u._id))
+            }, config)
+            setChats([data, ...chats])
+            socket.emit("create-chat",data,userInfo)
             onClose()
             toast.success("Chat Created")
         } catch (err) {
@@ -109,7 +116,7 @@ function GroupChatModal({ children }) {
                                 mb={1}
                                 onChange={(e) => handleSearch(e.target.value)} />
                         </FormControl>
-                        <Box w="100%" style={{display:'flex', flexWrap:'wrap'}}>
+                        <Box w="100%" style={{ display: 'flex', flexWrap: 'wrap' }}>
                             {
                                 selectedUsers.map(user => {
                                     return <UserBadge

@@ -5,7 +5,8 @@ const userModel = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    pic: { type: String, required: true, default: "https://res.cloudinary.com/mrt24/image/upload/v1668626624/vd2q9fm6rrommsgl76ve.png" }
+    pic: { type: String, required: true, default: "https://res.cloudinary.com/mrt24/image/upload/v1668626624/vd2q9fm6rrommsgl76ve.png" },
+    verify: {type:Boolean, default: false},
 },
     {
         timestamps: true,

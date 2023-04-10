@@ -27,6 +27,7 @@ ChatRouter.post('/', isAuth, expressAsyncHandler(async (req, res) => {
         select: 'name pic email'
     })
 
+
     if (isChat.length > 0) {
         res.send(isChat[0]);
     }
@@ -51,31 +52,19 @@ ChatRouter.post('/', isAuth, expressAsyncHandler(async (req, res) => {
 }))
 
 ChatRouter.get('/', isAuth, expressAsyncHandler(async (req, res) => {
-    try {
-        const isChat = await Chat.find({
+        let isChat = await Chat.find({
             users: req.user._id
         })
-            .populate("users", "-password")
-            .populate("groupAdmin", "-password")
-            .populate("latestMessage")
-            .populate({
-                path: "latestMessage",
-                populate: {
-                    path: "latestMessage.sender",
-                    select: "name pic email"
-                }
-            })
-            .sort({ updatedAt: -1 })
-        // isChat = await User.populate(isChat, {
-        //     path: 'latestMessage.sender',
-        //     select: 'name pic email'
-        // })
-        console.log(isChat)
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password")
+        .populate("latestMessage")
+        .sort({ updatedAt: -1 })
+       
+        isChat = await User.populate(isChat, {
+            path: 'latestMessage.sender',
+            select: 'name pic email'
+        })
         res.status(200).json(isChat)
-
-    } catch (error) {
-
-    }
 }))
 
 ChatRouter.post('/group', isAuth, expressAsyncHandler(async (req, res) => {

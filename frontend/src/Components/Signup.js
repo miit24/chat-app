@@ -5,7 +5,7 @@ import { Center, Box, FormControl, FormLabel, Input, Checkbox, Stack, Button, He
 import { InputGroup, HStack, InputRightElement } from '@chakra-ui/react';
 import { toast } from 'react-toastify';
 import { Store } from '../Store';
-import LoadingBox from './LoadingBox';
+import Loading from './Loading';
 import { getError } from '../util';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
@@ -26,7 +26,7 @@ const reducer = (state, action) => {
 
 function Signup() {
     const navigate = useNavigate();
-
+    const [load, setLoad] = useState(false)
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -73,15 +73,17 @@ function Signup() {
             return;
         }
         try {
+            setLoad(true)
             const { data } = await axios.post('api/users/signup', {
                 name,
                 email,
                 password,
                 image: image ? image : null
             });
+            setLoad(false)
             ctxDispatch({ type: 'USER_SIGNIN', payload: data });
             localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/chat')
+            navigate('/otp')
         } catch (err) {
             toast.error(getError(err));
         }
@@ -89,102 +91,107 @@ function Signup() {
 
     return (
         <>
-            <Helmet>
-                <title>Signup</title>
-            </Helmet>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-                <Stack align={'center'}>
-                    <Heading fontSize={'4xl'} textAlign={'center'}>
-                        Sign up
-                    </Heading>
-                </Stack>
-                <form onSubmit={submitHandler}>
-                    <Box
-                        rounded={'lg'}
-                        // bg={useColorModeValue('white', 'gray.700')}
-                        boxShadow={'lg'}
-                        p={8}>
-                        <Stack spacing={4}>
-                            <FormControl id="name" isRequired>
-                                <FormLabel>Name</FormLabel>
-                                <Input
-                                    type="text"
-                                    value={name}
-                                    required
-                                    onChange={(e) => {
-                                        setName(e.target.value)
-                                    }} />
-                            </FormControl>
-                            <FormControl id="email" isRequired>
-                                <FormLabel>Email address</FormLabel>
-                                <Input
-                                    type="email"
-                                    value={email}
-                                    required
-                                    onChange={(e) => {
-                                        setEmail(e.target.value)
-                                    }}
-                                />
-                            </FormControl>
-                            <FormControl id="password1" isRequired>
-                                <FormLabel>Password</FormLabel>
-                                <InputGroup>
-                                    <Input type="password"
-                                        value={password}
-                                        required
-                                        onChange={(e) => {
-                                            setPassword(e.target.value)
-                                        }} />
-                                </InputGroup>
-                            </FormControl>
-                            <FormControl id="password" isRequired>
-                                <FormLabel>Confirm Password</FormLabel>
-                                <InputGroup>
-                                    <Input type="password"
-                                        value={confirm}
-                                        required
-                                        onChange={(e) => {
-                                            setConfirm(e.target.value)
-                                        }}
-                                    />
-                                </InputGroup>
-                            </FormControl>
-                            <FormControl id="pic2" display={'none'}>
-                                <FormLabel>Image</FormLabel>
-                                <InputGroup>
-                                    <Input type="text"
-                                        value={image}
-                                        onChange={(e) => {
-                                            setImage(e.target.value)
-                                        }}
-                                    />
-                                </InputGroup>
-                            </FormControl>
-                            <FormControl id="pic">
-                                <FormLabel>Upload Profile</FormLabel>
-                                <InputGroup>
-                                    <Input type="file" onChange={uploadFileHandler}
-                                    />
-                                </InputGroup>
-                            </FormControl>
-                            <Stack spacing={10} pt={2}>
-                                <Button
-                                    disabled={loadingUpload}
-                                    loadingText="Submitting"
-                                    size="lg"
-                                    type='submit'
-                                    bg={'blue.400'}
-                                    color={'white'}
-                                    _hover={{
-                                        bg: 'blue.500',
-                                    }}>
+            {
+                load === true ? <Loading></Loading> :
+                    <div>
+                        <Helmet>
+                            <title>Signup</title>
+                        </Helmet>
+                        <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+                            <Stack align={'center'}>
+                                <Heading fontSize={'4xl'} textAlign={'center'}>
                                     Sign up
-                                </Button>
+                                </Heading>
                             </Stack>
+                            <form onSubmit={submitHandler}>
+                                <Box
+                                    rounded={'lg'}
+                                    // bg={useColorModeValue('white', 'gray.700')}
+                                    boxShadow={'lg'}
+                                    p={8}>
+                                    <Stack spacing={4}>
+                                        <FormControl id="name" isRequired>
+                                            <FormLabel>Name</FormLabel>
+                                            <Input
+                                                type="text"
+                                                value={name}
+                                                required
+                                                onChange={(e) => {
+                                                    setName(e.target.value)
+                                                }} />
+                                        </FormControl>
+                                        <FormControl id="email" isRequired>
+                                            <FormLabel>Email address</FormLabel>
+                                            <Input
+                                                type="email"
+                                                value={email}
+                                                required
+                                                onChange={(e) => {
+                                                    setEmail(e.target.value)
+                                                }}
+                                            />
+                                        </FormControl>
+                                        <FormControl id="password1" isRequired>
+                                            <FormLabel>Password</FormLabel>
+                                            <InputGroup>
+                                                <Input type="password"
+                                                    value={password}
+                                                    required
+                                                    onChange={(e) => {
+                                                        setPassword(e.target.value)
+                                                    }} />
+                                            </InputGroup>
+                                        </FormControl>
+                                        <FormControl id="password" isRequired>
+                                            <FormLabel>Confirm Password</FormLabel>
+                                            <InputGroup>
+                                                <Input type="password"
+                                                    value={confirm}
+                                                    required
+                                                    onChange={(e) => {
+                                                        setConfirm(e.target.value)
+                                                    }}
+                                                />
+                                            </InputGroup>
+                                        </FormControl>
+                                        <FormControl id="pic2" display={'none'}>
+                                            <FormLabel>Image</FormLabel>
+                                            <InputGroup>
+                                                <Input type="text"
+                                                    value={image}
+                                                    onChange={(e) => {
+                                                        setImage(e.target.value)
+                                                    }}
+                                                />
+                                            </InputGroup>
+                                        </FormControl>
+                                        <FormControl id="pic">
+                                            <FormLabel>Upload Profile</FormLabel>
+                                            <InputGroup>
+                                                <Input type="file" onChange={uploadFileHandler}
+                                                />
+                                            </InputGroup>
+                                        </FormControl>
+                                        <Stack spacing={10} pt={2}>
+                                            <Button
+                                                disabled={loadingUpload}
+                                                loadingText="Submitting"
+                                                size="lg"
+                                                type='submit'
+                                                bg={'blue.400'}
+                                                color={'white'}
+                                                _hover={{
+                                                    bg: 'blue.500',
+                                                }}>
+                                                Sign up
+                                            </Button>
+                                        </Stack>
+                                    </Stack>
+                                </Box>
+                            </form>
                         </Stack>
-                    </Box>
-                </form>
-            </Stack>
+                    </div>
+            }
         </>
     )
 }

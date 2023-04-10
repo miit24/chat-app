@@ -3,7 +3,6 @@ import { Box, Text } from "@chakra-ui/layout";
 // import { use } from "../../../Backend/routes/ChatRoutes";
 
 const UserListItem = ({ user, handleFunction }) => {
-    // console.log(user)
     return (
         <Box
             onClick={handleFunction}

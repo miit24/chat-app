@@ -8,15 +8,27 @@ import { Button } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from './ChatLoading'
 import GroupChatModal from './GroupChatModal'
+import io from 'socket.io-client'
+import { Flex, Avatar, Badge } from '@chakra-ui/react'
 
+const ENDPOINT = "http://localhost:5001"
+let socket
 
 function MyChats() {
-  const { state, selectedChat, setSelectedChat, chats, setChats,fetchAgain, setFetchAgain } = useContext(Store)
+  const { state, selectedChat, setSelectedChat, chats, setChats, fetchAgain, setFetchAgain } = useContext(Store)
   const [loggedUser, setLoggedUser] = useState()
   const { userInfo } = state
 
+  useEffect(() => {
+    socket = io(ENDPOINT)
+    socket.emit("setup", userInfo)
+    socket.on("connected", () => {
+    })
+  }, [])
+
   const getSender = (logUser, users) => {
-    return users[0]._id === userInfo._id ? users[1].name : users[0].name
+    if (users)
+      return users[0]._id === userInfo._id ? users[1] : users[0]
   }
 
   useEffect(() => {
@@ -33,6 +45,16 @@ function MyChats() {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")))
     fetchChats()
   }, [fetchAgain])
+
+  useEffect(() => {
+    socket.off("new-chat").on("new-chat", (data, user) => {
+      if (data.isGroupChat) {
+        setChats([data, ...chats])
+      } else {
+        setChats([data, ...chats])
+      }
+    })
+  },[socket])
 
   return (
     <Box
@@ -81,7 +103,12 @@ function MyChats() {
           <Stack overflowY="scroll">
             {chats.map((chat) => (
               <Box
-                onClick={() => setSelectedChat(chat)}
+                onClick={() => setSelectedChat((prev) => {
+                  if (chat.extra) {
+                    chat.extra = 0;
+                  }
+                  return chat
+                })}
                 cursor="pointer"
                 bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
                 color={selectedChat === chat ? "white" : "black"}
@@ -89,21 +116,32 @@ function MyChats() {
                 py={2}
                 borderRadius="lg"
                 key={chat._id}
-                
               >
-                <Text>
-                  {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
-                    : chat.chatName}
-                </Text>
-                {chat.latestMessage && (
-                  <Text fontSize="xs">
-                    <b>{chat.latestMessage.sender.name} : </b>
-                    {chat.latestMessage.content.length > 50
-                      ? chat.latestMessage.content.substring(0, 51) + "..."
-                      : chat.latestMessage.content}
-                  </Text>
-                )}
+                <Flex>
+                  <Avatar src={!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)?.pic
+                    : chat.chatName} />
+                  <Box ml='3'>
+                    <Text fontWeight='bold'>
+                      {!chat.isGroupChat
+                        ? getSender(loggedUser, chat.users)?.name
+                        : chat.chatName}
+                      {chat.extra > 0 ? <Badge ml='1' colorScheme='green'>
+                        New
+                      </Badge> : (<></>)}
+                    </Text>
+                    {chat.latestMessage && (
+                      <Text fontSize="xs">
+                        {chat.isGroupChat ? <b>{chat.latestMessage.sender.name} </b> : (<></>)}
+                        {chat.latestMessage.content.indexOf("base64") !== -1 ? <>
+                          <p><i class="bi bi-image" style={{margin:"0 2px"}}></i>Photo</p>
+                        </> : chat.latestMessage.content.length > 25
+                          ? chat.latestMessage.content.substring(0, 20) + "..."
+                          : chat.latestMessage.content}
+                      </Text>
+                    )}
+                  </Box>
+                </Flex>
               </Box>
             ))}
           </Stack>

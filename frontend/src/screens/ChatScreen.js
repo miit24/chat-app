@@ -21,6 +21,9 @@ function ChatScreen() {
         if (!userInfo) {
             navigate('/')
         }
+        if(userInfo.auth){
+            navigate('/otp')
+        }
     }, [userInfo])
 
     return (

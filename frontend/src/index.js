@@ -9,17 +9,15 @@ import { HelmetProvider } from 'react-helmet-async';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
     <HelmetProvider>
-      <StoreProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <StoreProvider>
           <ChakraProvider>
             <App />
           </ChakraProvider>
-        </BrowserRouter>
-      </StoreProvider>
+        </StoreProvider>
+      </BrowserRouter>
     </HelmetProvider>
-  </React.StrictMode>
 );
 
 

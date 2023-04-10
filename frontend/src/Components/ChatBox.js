@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { Store } from '../Store'
 import { Box } from '@chakra-ui/react';
 import SingleChat from './SingleChat';
+import { Text } from '@chakra-ui/react';
 
 function ChatBox() {
   const { state, dispatch: ctxDispatch, selectedChat, setSelectedChat, chats, setChats } = useContext(Store);
@@ -17,7 +18,14 @@ function ChatBox() {
       borderRadius="lg"
       borderWidth="1px"
     >
-      <SingleChat/>
+      {selectedChat ? <SingleChat /> : (
+        <Box style={{display:"flex"}} alignItems="center" justifyContent="center" h="100%">
+          <Text fontSize="3xl" pb={3} fontFamily="Work sans">
+            Click on a user to start chatting
+          </Text>
+        </Box>
+      )}
+
     </Box>
   )
 }

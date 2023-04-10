@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useState } from 'react';
 import { Center, Box, FormControl, FormLabel, Input, Checkbox, Stack, Button, Heading, useColorModeValue } from '@chakra-ui/react';
 import axios from 'axios';
@@ -23,14 +23,27 @@ function Login() {
                 email,
                 password
             })
+            if(!data.verify)
+            {
+                toast.error("Verify Your Email")
+                navigate('/')
+                return
+            }
             ctxDispatch({ type: 'USER_SIGNIN', payload: data });
             localStorage.setItem('userInfo', JSON.stringify(data));
-            toast.success("login successfully")
             navigate('/chat')
         } catch (err) {
             toast.error(getError(err));
         }
     }
+
+    useEffect(()=>{
+        if(userInfo){
+            if(userInfo.auth){
+                navigate('/otp')
+            }
+        }
+    },[])
 
     return (
         <>

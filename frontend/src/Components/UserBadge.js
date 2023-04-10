@@ -1,7 +1,11 @@
 import { CloseIcon } from "@chakra-ui/icons";
 import { Badge } from "@chakra-ui/layout";
+import { useContext } from "react";
+import { Store } from "../Store";
 
-const UserBadge = ({ user, handleFunction,admin }) => {
+const UserBadge = ({ user, handleFunction, admin }) => {
+  const { state, dispatch: ctxDispatch, selectedChat, setSelectedChat, chats, setChats, fetchAgain, setFetchAgain } = useContext(Store);
+  const { userInfo } = state;
   return (
     <Badge
       px={2}
@@ -13,11 +17,13 @@ const UserBadge = ({ user, handleFunction,admin }) => {
       fontSize={12}
       colorScheme="purple"
       cursor="pointer"
-      onClick={handleFunction}
+
     >
       {user.name}
       {/* {admin === user._id && <span> (Admin)</span>} */}
-      {admin && <CloseIcon pl={1} />}
+      {admin && <CloseIcon pl={1}
+        display={user._id != userInfo._id ? "inline" : "none"}
+        onClick={handleFunction} />}
     </Badge>
   );
 };

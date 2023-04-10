@@ -1,2 +1,118 @@
+/**
+  @desc: For Otp
+**/
 
+.otp-input-wrapper {
+    width: 240px;
+    text-align: left;
+    display: inline-block;
+  }
+  .otp-input-wrapper input {
+    padding: 0;
+    width: 264px;
+    font-size: 32px;
+    font-weight: 600;
+    color: #3e3e3e;
+    background-color: transparent;
+    border: 0;
+    margin-left: 12px;
+    letter-spacing: 48px;
+    font-family: sans-serif !important;
+  }
+  .otp-input-wrapper input:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  .otp-input-wrapper svg {
+    position: relative;
+    display: block;
+    width: 240px;
+    height: 2px;
+  }
 
+/* Loader */
+  .loader {
+    border: 10px solid #f3f3f3; /* Light grey */
+    border-top: 10px solid #1ebe36; /* Blue */
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    animation: spin 2s linear infinite;
+    
+  }
+
+  .MainLoader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40vh;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  
+  .messages {
+     display:'flex';
+     flex-direction: column;
+     overflow-y: scroll;
+     scrollbar-width: none;
+  }
+
+  /* Chat containers */
+.container {
+  border: 2px solid white;
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.container p{
+  margin: 8% 0%;
+}
+
+/* Darker chat container */
+.darker {
+  border-color: #B9F5D0;
+  background-color: #B9F5D0;
+}
+
+/* Clear floats */
+.container::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Style images */
+.container img {
+  float: left;
+  max-width: 60px;
+  width: 50%;
+  margin-right: 20px;
+  border-radius: 50%;
+}
+
+/* Style the right image */
+.container img.right {
+  float: right;
+  margin-left: 20px;
+  margin-right:0;
+}
+
+/* Style time text */
+.time-right {
+  float: right;
+  color: #aaa;
+  font-size: 10px;
+}
+
+/* Style time text */
+.time-left {
+  float: left;
+  color: #999;
+  font-size: 10px;
+}

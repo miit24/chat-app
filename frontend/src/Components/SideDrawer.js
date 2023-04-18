@@ -26,10 +26,12 @@ import { Tooltip } from "@chakra-ui/tooltip";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/avatar";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Store } from "../Store";
 import ChatLoading from './ChatLoading'
 import io from 'socket.io-client'
+import QrModal from "./QrModal";
+import Scanner from "./Scanner";
 
 const ENDPOINT = "http://localhost:5001"
 let socket
@@ -151,6 +153,11 @@ function SideDrawer() {
               <ProfileModal user={userInfo}>
                 <MenuItem>My Profile</MenuItem>{" "}
               </ProfileModal>
+              <Link to="/linkdevice">
+                <MenuItem>
+                  Link Device
+                </MenuItem>{" "}
+              </Link>
               <MenuDivider />
               <MenuItem onClick={logOutHandler}>Logout</MenuItem>
             </MenuList>

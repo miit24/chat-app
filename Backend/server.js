@@ -72,7 +72,6 @@ io.on("connection", (socket) => {
         if (!users) return console.log("no user")
 
         let filu = users.filter((e) => e._id !== userInfo._id)
-        console.log({filu})
         filu.forEach((user) => socket.to(user._id).emit("new-chat",chat,userInfo))
         // users.forEach(user => { 
         //     if(user._id === userInfo._id){

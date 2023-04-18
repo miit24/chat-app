@@ -48,11 +48,20 @@ function MyChats() {
 
   useEffect(() => {
     socket.off("new-chat").on("new-chat", (data, user) => {
-      if (data.isGroupChat) {
-        setChats([data, ...chats])
-      } else {
-        setChats([data, ...chats])
-      }
+      setChats((prev)=>{
+        let old = [...prev];
+        let flag = false;
+        for(let i=0;i<old.length;i++){
+          if(old[i]==data){
+            flag =true;
+            break;
+          }
+        }
+        if(!flag){
+          old.push(data);
+        }
+        return old;
+      })
     })
   },[socket])
 

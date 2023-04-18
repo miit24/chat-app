@@ -1,8 +1,10 @@
 const express = require('express')
 const expressAsyncHandler = require('express-async-handler')
 const User = require('../Models/UserModel.js')
+const Barcode = require('../Models/BarcodeModel.js')
 const Otp = require('../Models/OtpModel.js')
 const md5 = require('md5');
+const { v4: uuidv4 } = require('uuid');
 const { generateToken, isAuth } = require('../util.js')
 const Joi = require('@hapi/joi')
 const mailer = require('../Helpers/Mailer')
@@ -21,7 +23,7 @@ const UserRouter = express.Router();
 
 UserRouter.get('/', isAuth, expressAsyncHandler(async (req, res) => {
    const keyword = req.query.search ? {
-         email: { $regex: req.query.search, $options: "i" } 
+      email: { $regex: req.query.search, $options: "i" }
    } : {}
    const user = await User.find(keyword).find({ _id: { $ne: req.user._id } })
    res.json(user)
@@ -108,7 +110,7 @@ UserRouter.post('/otp', expressAsyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             pic: user.pic,
-            token: generateToken(user), 
+            token: generateToken(user),
          })
       }
    }
@@ -137,6 +139,35 @@ UserRouter.post('/login', expressAsyncHandler(async (req, res) => {
          })
       }
    }
+}))
+
+UserRouter.get('/login/barcode', isAuth, expressAsyncHandler(async (req, res) => {
+   const uuid_user = uuidv4()
+   let newData = new Barcode({
+      uuid: uuid_user,
+      user_id: req.user._id
+   })
+   const result = await newData.save()
+   res.json(result)
+}))
+
+UserRouter.post('/check/barcode', expressAsyncHandler(async (req, res) => {
+   const uuid = req.body.uuid;
+   const data = await Barcode.findOne({ uuid })
+   if (!data) {
+      throw new Error("Invalid Authentication!");
+   }
+
+   const userData = await User.findById(data.user_id)
+   const message = {
+      _id: userData._id,
+      name: userData.name,
+      email: userData.email,
+      pic: userData.pic,
+      verify: userData.verify,
+      token: generateToken(userData),
+   }
+   res.json(message)
 }))
 
 module.exports = UserRouter;

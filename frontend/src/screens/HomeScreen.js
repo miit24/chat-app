@@ -1,10 +1,11 @@
 import React, { useContext } from 'react'
 import { Center, Box,} from '@chakra-ui/react';
 import { Tabs,TabPanels, Tab, TabPanel } from '@chakra-ui/react'
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Login from '../Components/Login';
 import Signup from '../Components/Signup';
 import { Store } from '../Store';
+import Scanner from '../Components/Scanner';
 
 function HomeScreen() {
   const {state} = useContext(Store)
@@ -15,6 +16,7 @@ function HomeScreen() {
           <Center m={2}>
             <Tab >Login</Tab>
             <Tab >SignUp</Tab>
+            <Tab >Link Device</Tab>
           </Center>
           <TabPanels>
             <TabPanel>
@@ -22,6 +24,9 @@ function HomeScreen() {
             </TabPanel>
             <TabPanel>
               <Signup/>
+            </TabPanel>
+            <TabPanel>
+              <Scanner/>
             </TabPanel>
           </TabPanels>
         </Tabs>

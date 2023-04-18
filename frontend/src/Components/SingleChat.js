@@ -1,5 +1,5 @@
 import { Box, FormControl, Input, Text } from '@chakra-ui/react';
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect,useCallback } from 'react'
 import { Store } from '../Store';
 import { Spinner } from "@chakra-ui/react";
 import ProfileModal from "./ProfileModal"
@@ -13,7 +13,6 @@ import io from 'socket.io-client'
 import { Avatar } from '@chakra-ui/react';
 import { WrapItem } from '@chakra-ui/react';
 import audio from '../recieve.mpeg'
-import { useRef } from 'react';
 import audio1 from '../send.mpeg'
 import audio2 from '../notify.mpeg'
 import EmojiPicker from 'emoji-picker-react';
@@ -27,6 +26,8 @@ import {
 } from '@chakra-ui/react'
 import { Button } from '@chakra-ui/react';
 import { useDisclosure } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid'
 
 const ENDPOINT = "http://localhost:5001"
 let socket, compareChat
@@ -40,9 +41,11 @@ function SingleChat() {
     const [newMessage, setNewMessages] = useState('')
     const sendMessageMusic = new Audio(audio1)
     const [socketConnected, setSocketConnected] = useState(false)
+    const [values,setValues] = useState()
     const recieveMessageMusic = new Audio(audio)
     const notificationMusic = new Audio(audio2)
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const navigate = useNavigate()
 
     useEffect(() => {
         socket = io(ENDPOINT)
@@ -51,6 +54,10 @@ function SingleChat() {
             setSocketConnected(true)
         })
     }, [])
+
+    const HandleJoin = () => {
+        const myWindow = window.open(`/video/${selectedChat._id}`,"_blank","width=500, height=500")
+    }
 
     const fetchChat = async () => {
         if (!selectedChat) return;
@@ -93,7 +100,6 @@ function SingleChat() {
         setNewMessages(e.target.value);
     };
 
-
     const sendChat = async (e) => {
         e.preventDefault();
         if (e.key === "Enter" && newMessage) {
@@ -130,7 +136,6 @@ function SingleChat() {
     }
 
     const sendImage = async (e) => {
-        console.log("here0");
         let file = e.target.files[0]
         if (file.size > 75000) {
             toast.error("Image size less than 75KB")
@@ -142,13 +147,10 @@ function SingleChat() {
         // else{
         let reader = new FileReader()
         reader.addEventListener("load", () => {
-            console.log("here");
             setNewMessages(reader.result)
         }, false)
         if (file) {
-
             reader.readAsDataURL(file)
-            console.log("here1")
         }
         // }
     }
@@ -205,7 +207,7 @@ function SingleChat() {
 
             }
         })
-    },[socket])
+    }, [socket])
 
 
     return (
@@ -240,6 +242,9 @@ function SingleChat() {
                                             <ProfileModal
                                                 user={getUserAll(selectedChat.users)}
                                             />
+                                            <Button onClick={HandleJoin}>
+                                                Call
+                                            </Button>
                                         </WrapItem>
                                     </>
                                 ) : (
@@ -274,10 +279,10 @@ function SingleChat() {
                                     <ScrollableChat message={message} />
                                 </div>
                             )}
-                            <FormControl onKeyPress={(e) => e.key === 'Enter' && sendChat(e)}mt={2}>
+                            <FormControl onKeyPress={(e) => e.key === 'Enter' && sendChat(e)} mt={2}>
                                 {
                                     newMessage.length > 0 &&
-                                     newMessage.indexOf("base64") !== -1 ?
+                                        newMessage.indexOf("base64") !== -1 ?
                                         <Input
                                             type="text"
                                             variant="filled"
